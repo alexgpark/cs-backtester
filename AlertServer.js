@@ -27,13 +27,3 @@ app.get('/alerts/:id', (req, res) => {
 });
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Server running on ${port}`));
-
-
-
-const express = require('express');
-const app = express();
-app.get('/hey', (req, res) => {
-    res.send('yo!!!!!');
-})
-const port = process.env.PORT || 3000;
-app.listen(port, () => console.log(`Server running on ${port}`));
