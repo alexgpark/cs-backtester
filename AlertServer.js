@@ -16,14 +16,5 @@ app.get('/alerts', (req, res) => {
     });
 });
 
-app.get('/alerts/:id', (req, res) => {
-    AlertModel.findOne({_id: req.params.id}, (err, alerts) => {
-        if (err) {
-            res.send(err);
-        } else {
-            res.send(alerts);
-        }
-    });
-});
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Server running on ${port}`));

@@ -15,8 +15,16 @@ const profitTake = 1.05;
 var SLHit = 0;
 var PTHit = 0;
 
-axios.get(`http://localhost:3000/alerts`).then(res => {
+// let baseUrl;
+// if (process.env.NODE_ENV === 'production') {
+//     baseUrl = 'https://cs-alerts.herokuapp.com'
+// } else {
+//     baseUrl = 'http://localhost:3000'
+// }
 
+// axios.get(`${baseUrl}/alerts`).then(res => {
+axios.get(`https://cs-alerts.herokuapp.com/alerts`).then(res => {
+    
     log("---------------------------------------------");
     log(JSON.stringify(res.data, null, 2));
     log("---------------------------------------------");
