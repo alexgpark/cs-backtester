@@ -9,11 +9,16 @@ const endTime = 1531785600;
 // const count = 1008;
 // const interval = '10m';
 
-const stopLoss = 0.95;
-const profitTake = 1.05;
+// const stopLoss = 0.90;
+// const profitTake = 1.10;
+
+const stopLoss = 0.80;
+const profitTake = 1.20;
 
 var SLHit = 0;
 var PTHit = 0;
+var ASHit = 0;
+var ASArray = [];
 
 // let baseUrl;
 // if (process.env.NODE_ENV === 'production') {
@@ -24,80 +29,94 @@ var PTHit = 0;
 
 // axios.get(`${baseUrl}/alerts`).then(res => {
 axios.get(`https://cs-alerts.herokuapp.com/alerts`).then(res => {
+
+    // for (var i = 0; i < 311; i++) { 
+    for (var i = 0; i < 311; i++) { 
+      // log(res.data[i]);
+      log(i);
+      const startPrice = res.data[i].history[0].open;
+      const stopLossPrice = startPrice * stopLoss;
+      const profitPrice = startPrice * profitTake;
+      const startTime = res.data[i]._id.startTime;
+      
+
+      for (x = 0; x < res.data[i].history.length; x++) {
+        // log("*********************************************");
+        // log(x);
+        const rowData =  res.data[i].history[x]
+        // log(rowData);
+        // log("-----------------------------------");
+        // log("Start Price:", startPrice);
+        // log("Stop Loss Price:", stopLossPrice);
+        // log("Profit Price:", profitPrice);
+        // log("*********************************************");
+        const openPrice =  res.data[i].history[x].open;
+        const closePrice = res.data[i].history[x].close;
+        const highPrice = res.data[i].history[x].high;
+        const lowPrice = res.data[i].history[x].low;
+        const timestamp = res.data[i].history[x].timestamp;
+
+        if (lowPrice <= stopLossPrice) {
+          SLHit = SLHit + 1;
+          // log("Stop Loss on Hour:", x)
+          // log("Stop Loss Price:", stopLossPrice);
+          // log("Low Price:", lowPrice);
+          // log("Time Hit:", timestamp)
+          break;
+
+        } else if (highPrice >= profitPrice) {
+          PTHit = PTHit + 1;
+          // log("Profit Take on Hour #:", x)
+          // log("High Price:", highPrice);
+          // log("Profit Price:", profitPrice);
+          break;
+
+        } else if (x>167) {
+          // log("AutoSell");
+          // log(rowData);
+          // log("Start Price:", startPrice);
+          // log("Low Price:", lowPrice);
+          // log("Stop Loss Price:", stopLossPrice);
+          // log("High Price:", highPrice);
+          // log("Profit Price:", profitPrice);
+          // log("closePrice:", closePrice);
+          var autoSellResult = ((((closePrice-startPrice)/startPrice))*100);
+          // log("autoSellResult:", autoSellResult);
+          // log("Start Price:", startPrice);
+          // log("Stop Loss Price:", stopLossPrice);
+          // log("Profit Price:", profitPrice);
+          ASArray.push(autoSellResult);
+          ASHit = ASHit + 1;
+
+        } else {
+          // log(rowData);
+          // log("-----------------------------------");
+          // log("Start Price:", startPrice);
+          // log("Stop Loss Price:", stopLossPrice);
+          // log("Profit Price:", profitPrice);
+          // log("*********************************************");
+        }
+
+      }
+
+      log("PTHIT:", PTHit);
+      log("SLHIT:", SLHit);
+      log("ASHit:", ASHit);
+      // log("ASArray:", ASArray.length);
+      // // log(ASArray);
+      log(ASArray.toString());
+      
+      log("*********************************************");
+    }
+
+
+    // for (var z = 0; z < ASArray.length; x++) {
+    //   log(ASArray[z]);
     
-    log("---------------------------------------------");
-    log(JSON.stringify(res.data, null, 2));
-    log("---------------------------------------------");
-
-    // console.log(res.data);
-
-    // console.log(res.data.status);
-    // console.log(res.data.data.quotes);
-    // log(res.data.data.quotes[0].quote);
-
-    // log("---------------------------------------------");
-    // log("---------------------------------------------");
-    // log("---------------------------------------------");
-
-    // const startPrice = res.data.data.quotes[0].quote.BTC.price
-    // // log(`StartPrice: ${startPrice}`);
-
-    // // log("---------------------------------------------");
-    // // log("---------------------------------------------");
-    // // log("---------------------------------------------");
-
-    // // var i;
-
-    // for (i = 0; i < res.data.data.quotes.length; i++) { 
-    //     // log("---------------------------------------------");
-
-    //     // console.log(res.data.data.quotes[i].quote.BTC.price);
-    //     // log(res.data.data.quotes[i].quote);
-
-    //     const rowPrice = res.data.data.quotes[i].quote.BTC.price;
-    //     const timeStamp = res.data.data.quotes[i].timestamp;
-    //     const difference = (((rowPrice - startPrice) / startPrice)*100);
-
-    //     // log(rowPrice);
-
-    //     // log(`Row Price: ${rowPrice}`)
-    //     // log(`Timestamp: ${timeStamp} `)
-    //     // log(`Price Difference: ${difference}`);
-
-    //     const stopLossPrice = startPrice * stopLoss;
-    //     const profitPrice = startPrice * profitTake;
-
-    //     if (rowPrice <= stopLossPrice) {
-
-    //         log("STOP LOSS HIT");
-    //         log(`Row Price: ${rowPrice}`)
-    //         log(`Timestamp: ${timeStamp} `)
-    //         log(`Row Number: ${i}`);
-    //         // log(SLHit);
-    //         SLHit = SLHit + 1;
-    //         log(SLHit);
-    //         break
-
-    //     } else if (rowPrice >= profitTake) {
-
-    //         log("PROFIT TAKE HIT");
-    //         log(`Row Price: ${rowPrice}`)
-    //         log(`Timestamp: ${timeStamp} `)
-    //         log(`Row Number: ${i}`);
-    //         PTHit = PTHit + 1;
-    //         log(PTHit);
-    //         break
-
-    //     } else {
-    //         // log("Still within boundaries");
-    //     }
     // }
+}).catch(err => console.log('error', error))
 
-    // console.log(res.data);
-    // console.log(res.data.data.quotes.length);
 
-    
-  }).catch(err => console.log('error fetching info from coinmarketcap'))
 
 
   

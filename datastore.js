@@ -49,7 +49,7 @@ function callback(error, response, body) {
             alertDataObjects.push(object);
         }
 
-        log("# OF ALERTS",alertDataObjects.length);
+        log("# OF ALERTS DETECTED TO PROCESS",alertDataObjects.length);
         
     } else {
         console.log("nope!");
@@ -60,19 +60,18 @@ function callback(error, response, body) {
     asyncLib.eachSeries(alertDataObjects, (alert, callback) => {
 
         const { startTime, symbol } = alert;
-        log(alert);
+        // log(alert);
         
         // axios.get(`https://beta-pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/historical?CMC_PRO_API_KEY=c165df17-bfc9-4bd5-967d-c61e687c2ce5&symbol=${symbol}&time_start=${startTime}&time_end=${endTime}&count=1008&interval=10m&convert=${tradingPair}`).then(res => {
         
         axios.get(`https://min-api.cryptocompare.com/data/histohour?fsym=${symbol}&tsym=BTC&limit=168&aggregate=1&toTs=${startTime}`).then(res => {
 
-            // log(res.data.Data);
-
-            // for(var i = 1; i < res.data.Data.length; i++) {
-            //     log(res.data.Data[i].high);
-            //     log(res.data.Data[i].low);
-            //     log(res.data.Data[i].time);
-            // }
+        // log(res.data.Data[1].high);
+        // log(res.data.Data[1].low);
+        // log(res.data.Data[1].open);
+        // log(res.data.Data[1].close);
+        // log(res.data.Data[1].time);
+        // log(symbol);
     
             AlertModel.findOne({
                 _id: {
@@ -81,7 +80,9 @@ function callback(error, response, body) {
                 }
             }, (err, alert) => {
                 if (alert) {
-                    console.log('Alert exist already');
+                    console.log('Alert exists already');
+                    log(symbol);
+                    log(startTime);
                     callback();
                 } else {
                     AlertModel.create({
@@ -92,13 +93,15 @@ function callback(error, response, body) {
                         history: res.data.Data.map(i => ({
                             high: i.high,
                             low: i.low,
+                            open: i.open,
+                            close: i.close,
                             timestamp: i.time
                         }))
                     }, (err, alert) => {
                         if (err) {
                             console.log('error creating alert', err);
                         } else {
-                            console.log('successfully created');
+                            // console.log('successfully created');
                         }
                         callback();
                     })             
